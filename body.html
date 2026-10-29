@@ -1,0 +1,19 @@
+<div id="app">
+  <header class="topbar">
+    <button id="menuBtn" aria-label="Show watchlist">☰</button>
+    <div class="brand">AGULA<span>TERMINAL</span></div>
+    <div class="cmd"><span class="prompt">›</span><input id="cmd" autocomplete="off" spellcheck="false" aria-label="Command line" placeholder="Ticker or function, e.g. AAPL DCF · NVDA OPT · CMP MSFT GOOGL · NEWS FED   (press / to focus)"><div id="suggest" hidden></div></div>
+    <div class="status"><div id="modes"></div><div id="clocks"></div></div>
+  </header>
+  <div class="tape" aria-label="Ticker tape"><div id="tapeInner"></div></div>
+  <div class="main">
+    <aside class="side" aria-label="Watchlist and alerts">
+      <h4>Watchlist</h4><div id="watch"></div>
+      <input id="watchAdd" class="txt" placeholder="Add symbol, press Enter" aria-label="Add symbol to watchlist">
+      <h4>Alerts</h4><div id="alerts"></div>
+    </aside>
+    <section class="work"><div id="scrHead"></div><div id="screen" class="screen"></div></section>
+  </div>
+  <nav id="fkeys" aria-label="Functions"></nav>
+</div>
+<div id="toasts" aria-live="polite"></div>
