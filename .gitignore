@@ -1,9 +1,0 @@
-__pycache__/
-*.pyc
-.venv/
-venv/
-.env
-.dev.vars
-node_modules/
-.wrangler/
-agula_terminal.html
