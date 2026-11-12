@@ -1,0 +1,10 @@
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.29
+yfinance>=1.0,<2.0
+pandas>=2.1
+numpy>=1.26
+requests>=2.31
+tzdata
+xlrd>=2.0         # reads Damodaran's .xls data files
+openpyxl>=3.1     # reads .xlsx data files
+xlsxwriter>=3.1   # builds the DCF Excel model (formulas, charts, tables)

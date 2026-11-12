@@ -1,0 +1,33 @@
+# Render Blueprint for Agula Terminal.
+# Render dashboard -> New -> Blueprint -> pick this repository -> Apply.
+services:
+  - type: web
+    name: agula-terminal
+    runtime: python
+    plan: free            # free: sleeps after 15 min idle, ~1 min to wake. Paid plans stay on.
+    region: singapore     # closest Render region to Mongolia; oregon, ohio, virginia, frankfurt also exist
+    buildCommand: pip install -r requirements.txt
+    # One worker on purpose: every visitor shares one in-memory cache.
+    startCommand: uvicorn agula:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NO_BROWSER
+        value: "1"
+      - key: AGULA_CACHE_DIR
+        value: /tmp/agula-cache
+      - key: AGULA_WARM
+        value: "1"
+      - key: AGULA_RATE_LIMIT
+        value: "600"
+      # Paper-trading bots. Free plans erase the disk on restart, so bots live in /tmp
+      # (a backup also stays in each browser). With a paid plan, add a persistent disk
+      # and point AGULA_DATA_DIR at it. Set AGULA_BOT_TOKEN to stop strangers editing bots.
+      - key: AGULA_DATA_DIR
+        value: /tmp/agula-data
+      - key: AGULA_BOT_TOKEN
+        sync: false
+      # Optional: a free FRED key makes the macro dashboard and release calendar more reliable.
+      # Render asks for it when you create the Blueprint (leave blank to skip).
+      - key: FRED_API_KEY
+        sync: false
