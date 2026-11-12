@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AGULA · ALGO / Paper Lab</title>
+<style>
+:root{color-scheme:dark;font:15px system-ui,Segoe UI,sans-serif;background:#0d1520;color:#e5edf5}
+*{box-sizing:border-box}body{max-width:1080px;margin:auto;padding:24px}header,.title{display:flex;align-items:center;justify-content:space-between;gap:12px}a{color:#ffb347;text-decoration:none}
+.brand{font-weight:800;letter-spacing:2px;color:#ffb347;font-size:22px}.tag{font-size:12px;color:#75d9ad;border:1px solid #296c57;padding:6px 10px;border-radius:999px}
+h1{font-size:28px;margin:30px 0 8px}p,.dim{color:#a4b4c5;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.panel{border:1px solid #273a4b;border-radius:12px;background:#152232;padding:20px}label{font-size:13px;color:#acbdcd;display:block;margin:12px 0 6px}
+input{width:100%;background:#0e1824;color:#fff;border:1px solid #3b5164;padding:11px;border-radius:7px;font:inherit}button{background:#ffb347;border:0;border-radius:8px;padding:12px 18px;color:#101820;font-weight:700;cursor:pointer;margin-top:18px}button.secondary{background:#253c4e;color:#fff;margin-left:8px}button:disabled{opacity:.5}pre{overflow:auto;white-space:pre-wrap;color:#bde2ff}
+.alert{background:#312b1e;padding:12px 15px;border-left:3px solid #e5ac41;border-radius:4px;margin:16px 0}.footer{margin-top:26px;font-size:12px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+</style></head><body>
+<header><div class="brand">AGULA <span style="color:#778fa1;font-size:13px">/ ALGO</span></div><a href="/">← Return to terminal</a></header>
+<h1>Research signal & paper simulation</h1>
+<div class="title"><p>Daily moving-average crossover • manual, locally simulated orders</p><span class="tag">PAPER ONLY</span></div>
+<div class="alert">Not a live broker. Market data may be delayed or stale. Render free instances can lose SQLite files when restarted. Never use this screen for real-money execution.</div>
+<div class="grid"><section class="panel"><h2>Strategy settings</h2>
+<label for="symbol">Ticker</label><input id="symbol" value="SPY" maxlength="15" autocomplete="off">
+<div class="grid"><div><label for="fast">Fast SMA</label><input id="fast" type="number" value="20" min="2" max="150"></div><div><label for="slow">Slow SMA</label><input id="slow" type="number" value="50" min="3" max="250"></div></div>
+<div class="grid"><div><label for="cash">Initial paper cash (USD)</label><input id="cash" type="number" value="10000" min="1"></div><div><label for="allocation">Max allocation (0–0.25)</label><input id="allocation" type="number" value="0.10" min="0.01" max="0.25" step="0.01"></div></div>
+<label for="token">Paper-write admin token (not stored)</label><input id="token" type="password" placeholder="Only needed to save simulated fills" autocomplete="off">
+<button id="check">Check signal</button><button class="secondary" id="execute">Record paper signal</button></section>
+<section class="panel"><h2>Signal result</h2><p class="dim">Historical signals only. The latest quoted price is used as an approximate simulation price.</p><pre id="result" aria-live="polite">Choose Check signal.</pre><h3>How it works</h3><p>BUY when fast SMA crosses above slow SMA; SELL on cross below; otherwise HOLD. Only one position per symbol in this experimental paper ledger.</p></section></div>
+<p class="footer">Research-only demo. No brokerage credentials or live trade APIs are included.</p>
+<script>
+const val=id=>document.getElementById(id).value;
+const out=document.getElementById('result');
+const req=()=>({symbol:val('symbol').trim().toUpperCase(),fast:Number(val('fast')),slow:Number(val('slow')),initial_cash:Number(val('cash')),max_allocation:Number(val('allocation'))});
+async function run(write){const body=req();out.textContent='Loading…';try{
+let url='/api/algo/signal?'+new URLSearchParams({symbol:body.symbol,fast:body.fast,slow:body.slow});
+let res=write?await fetch('/api/algo/paper/execute',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+val('token')},body:JSON.stringify(body)}):await fetch(url);
+let data=await res.json();out.textContent=JSON.stringify(data,null,2);if(!res.ok)out.textContent='HTTP '+res.status+'\n'+out.textContent;
+}catch(error){out.textContent='Request failed: '+error.message}}
+document.getElementById('check').onclick=()=>run(false);
+document.getElementById('execute').onclick=()=>{if(confirm('Record a LOCAL simulated trade only? No broker order will be sent.'))run(true)};
+</script></body></html>

@@ -1,0 +1,28 @@
+# Replace the root Render Blueprint with this file to enable /algo.
+services:
+  - type: web
+    name: agula-terminal
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn render_app:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NO_BROWSER
+        value: "1"
+      - key: AGULA_CACHE_DIR
+        value: /tmp/agula-cache
+      - key: AGULA_PAPER_DIR
+        value: /tmp/agula-paper
+      - key: AGULA_WARM
+        value: "1"
+      - key: AGULA_RATE_LIMIT
+        value: "240"
+      - key: FRED_API_KEY
+        sync: false
+      # Optional: set a strong random token to enable paper-write endpoints.
+      # No token = read-only paper dashboard.
+      - key: AGULA_PAPER_TOKEN
+        sync: false
